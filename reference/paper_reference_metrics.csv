@@ -1,0 +1,8 @@
+quantity,value,scope,interpretation
+BEDOL_macro_nRMSE,0.103949,frozen common protocol,Reference only; fresh runs may differ slightly
+BEDOL_macro_MAE_kW,26.097,frozen common protocol,Reference only
+BEDOL_macro_WAPE,0.285620,frozen common protocol,Reference only
+BEDOL_macro_R2,0.845075,frozen common protocol,Reference only
+AdaptiveDecoder_macro_nRMSE,0.105723,frozen common protocol,Strongest common-protocol comparator in the paper run
+BEDOL_vs_Adaptive_mean_normalized_squared_loss_diff,-0.000368,frozen common protocol,Negative favors BEDOL
+BEDOL_90pct_interval_coverage,0.8961,validation-calibrated uncertainty,Secondary uncertainty result
