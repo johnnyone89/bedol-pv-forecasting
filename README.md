@@ -1,65 +1,93 @@
 # BEDOL PV Forecasting
 
-Reproducibility resources for **BEDOL (Bayesian Energy-Dynamics Operator Learning)**, a shared selective state-space model for 24-step-ahead multi-site photovoltaic power forecasting.
+Reproducibility resources for **BEDOL (Bayesian Energy-Dynamics Operator Learning)**, a shared selective state-space framework for 24-step-ahead multi-site photovoltaic power forecasting.
 
-## What this repository is for
+## Reproducibility philosophy
 
-This repository is designed to let readers **re-run the modeling pipeline from the released six-site hourly data** and obtain results that are close to the reported findings. It does **not** store the full set of paper outputs, fitted predictions, bootstrap draws, or every intermediate artifact. Small configuration and reference CSV files are included so that a fresh run can be audited against the paper protocol.
+This repository is intentionally organized so that a reader can re-run the method from the released six-site CSV files. It does **not** publish every fitted prediction, checkpoint, bootstrap draw, or intermediate paper artifact. Instead, it provides the data specification, frozen chronological split, validation-selected configuration, compact reference metrics, and a sequence of purpose-specific notebooks.
 
-> Reproducibility note: exact floating-point values can vary slightly with GPU model, CUDA/cuDNN, PyTorch version, and stochastic optimization. The notebook fixes random seeds and the chronological split, but the goal is faithful re-execution rather than bit-for-bit reproduction.
+Exact floating-point values can vary slightly across GPU models, CUDA/cuDNN versions, and PyTorch releases. The goal is faithful re-execution of the protocol and recovery of the same qualitative findings, not bit-for-bit equality.
 
-## Minimal repository layout
+## Repository structure
 
 ```
 .
 ├── README.md
 ├── requirements.txt
 ├── configs/
+│   ├── chronological_splits.csv
+│   ├── data_dictionary.csv
 │   ├── experiment_config.csv
-│   ├── site_manifest.csv
-│   └── chronological_splits.csv
+│   └── site_manifest.csv
+├── data/
+│   └── README.md
+├── notebooks/
+│   ├── 00_data_audit_and_split.ipynb
+│   ├── 01_train_bedol_core.ipynb
+│   ├── 02_evaluate_and_statistics.ipynb
+│   ├── 03_ablation_study.ipynb
+│   └── 04_xai_and_uncertainty.ipynb
 ├── reference/
 │   └── paper_reference_metrics.csv
-└── notebooks/
-    └── BEDOL_reproduce_core.ipynb
+└── src/
+    └── bedol_repro.py
 ```
 
-Place the six released `*_FILLED.csv` site files under `data/` (or change `DATA_DIR` in the notebook). The notebook accepts the filenames listed in `configs/site_manifest.csv`.
+## English-only data filenames
 
-## Main protocol
+Rename the six released CSV files exactly as follows and place them in `data/`:
 
-- Lookback: **168 h**
+- `01_Busan_New_Port_FILLED.csv`
+- `02_Busan_Water_Treatment_FILLED.csv`
+- `03_Dangjin_Landfill_Solar_FILLED.csv`
+- `04_Donghae_Solar_FILLED.csv`
+- `05_Gwangyang_Port_2_FILLED.csv`
+- `06_Hadong_Water_Treatment_FILLED.csv`
+
+## Notebook workflow
+
+### 00 — Data audit and chronological split
+Checks filenames, hashes, target completeness, quality flags, and the frozen split rule. It writes only compact audit files.
+
+### 01 — Train BEDOL core
+Rebuilds leakage-safe preprocessing, trains the frozen BEDOL configuration, saves fresh checkpoints, and generates held-out predictions. `FAST` mode is provided for a quick pipeline check; `PAPER` mode uses seeds 11, 29, and 47 and the longer training budget.
+
+### 02 — Evaluate and statistical inference
+Reads the newly generated predictions, computes site-level and macro metrics, compares them with compact reference values, and runs a moving-block bootstrap sanity check.
+
+### 03 — Ablation study
+Retrains only the mechanism variants needed to test the main architectural claims: fixed transition, no site embedding, no Bayesian latent, no NLinear anchor, and no teacher forcing. It is intentionally separate because these runs are computationally expensive.
+
+### 04 — XAI and uncertainty
+Uses the freshly trained BEDOL checkpoint(s) for grouped blocked-permutation model-reliance analysis and Monte Carlo latent sampling for interval diagnostics. It does not use cached XAI or uncertainty results.
+
+## Main frozen protocol
+
+- Historical lookback: **168 h**
 - Forecast horizon: **24 h**
-- Chronological split: **last 1 year = test; preceding 1 year = validation; earlier data = training**
-- Train / validation / test window strides: **6 / 12 / 6 h**
-- Canonical BEDOL encoder: **SelectiveSSM**
-- Final seeds used in the paper pipeline: **11, 29, 47**
-- Architecture and hyperparameters are locked using validation data only; the test year is not used for model selection.
+- Last complete year: **test**
+- Preceding complete year: **validation**
+- Earlier period: **training**
+- Training / validation / test origin strides: **6 / 12 / 6 h**
+- Canonical encoder: **SelectiveSSM**
+- Final paper seeds: **11, 29, 47**
+- Architecture and hyperparameters are selected using validation data only. The held-out test year is not used for model selection.
 
-The data release preserves quality and provenance columns. For primary evaluation, use rows marked `recommended_for_evaluation=1`. For filled-target training, `recommended_for_training_filled=1` can be used. The target is `solar_power_filled`.
+Primary evaluation respects `recommended_for_evaluation=1`. Filled-target training can use `recommended_for_training_filled=1`. See `data/README.md` and `configs/data_dictionary.csv`.
 
-## How to reproduce
+## Running the reproduction
 
-1. Install the environment:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Put the six site CSV files in `data/`.
-3. Open `notebooks/BEDOL_reproduce_core.ipynb`.
-4. Run **FAST mode** first to validate the pipeline.
-5. Switch to **PAPER mode** for the three-seed, longer training configuration.
-6. Compare the newly produced summary table with `reference/paper_reference_metrics.csv`.
+```bash
+pip install -r requirements.txt
+jupyter lab
+```
 
-The notebook also includes optional switches for the main mechanism checks (fixed transition, no site embedding, no Bayesian latent, no NLinear anchor, no teacher forcing), a moving-block bootstrap comparison, and grouped blocked-permutation XAI. Those switches are off by default so the core reproduction remains practical.
+Run the notebooks in numerical order. Start with `FAST` mode in Notebook 01 to verify the environment before launching the longer paper-style run.
 
-## What is and is not claimed
+## Reference values
 
-The released code is intended to reproduce the **method and experimental protocol**. It is not a cache of the published outputs. Small differences in metrics are expected across software/hardware environments. The central qualitative pattern to verify is that the shared, site-conditioned selective dynamics remain competitive under the same chronological protocol and that the fixed-transition / independent or de-conditioned variants are weaker when the full paper experiment is run.
-
-## Data integrity
-
-The six-site release contains 278,232 hourly rows in total across six sites. The site manifest records date ranges, row counts, quality flags, recommended training/evaluation counts, and SHA-256 hashes. See `configs/site_manifest.csv` and the original release manifest for details.
+`reference/paper_reference_metrics.csv` contains only a small set of paper-level reference values for sanity checking. It is not a cache of the full results. Newly generated predictions and analyses are written locally under `reproduction_outputs/`.
 
 ## Citation
 
-If you use this repository, please cite the BEDOL paper once the final bibliographic record is available. The citation block will be updated after publication.
+Please cite the BEDOL paper once the final bibliographic record is available. This section will be updated after publication.
