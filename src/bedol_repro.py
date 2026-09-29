@@ -258,7 +258,7 @@ class BEDOL(nn.Module):
         else:
             eps = (
                 torch.randn_like(mu)
-                if (sample and self.training)
+                if sample
                 else torch.zeros_like(mu)
             )
             z = mu + torch.exp(0.5 * lv) * eps
@@ -428,25 +428,9 @@ def predict_ensemble(
             pred, *_ = model(hist, fut, site_t, sample=False)
             point_preds.append(pred.cpu().numpy())
             if mc_samples:
-                draws = []
                 for _ in range(mc_samples):
-                    # Temporarily enable latent sampling without enabling dropout.
-                    state, alpha = model.encoder(hist)
-                    emb = model.site_emb(site_t)
-                    cond = (
-                        state
-                        if model.variant == "no_site_embedding"
-                        else torch.cat([state, emb], -1)
-                    )
-                    mu = model.mu(cond)
-                    lv = model.logvar(cond).clamp(-10, 6)
-                    eps = torch.randn_like(mu)
-                    z = mu + torch.exp(0.5 * lv) * eps
-                    # Public notebook uses the model's deterministic point path
-                    # for primary metrics; uncertainty notebook performs a
-                    # transparent approximate latent-resampling diagnostic.
-                    draws.append(pred.cpu().numpy())
-                mc_preds.extend(draws)
+                    draw, *_ = model(hist, fut, site_t, sample=True)
+                    mc_preds.append(draw.cpu().numpy())
 
         pred = np.mean(point_preds, axis=0)
         yy = y.numpy()
