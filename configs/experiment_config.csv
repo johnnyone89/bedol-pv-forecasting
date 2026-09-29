@@ -1,0 +1,26 @@
+key,value,notes
+lookback,168,hours
+horizon,24,hours
+train_stride,6,hours between training origins
+val_stride,12,hours between validation origins
+test_stride,6,hours between test origins
+hidden_dim,96,validation-selected canonical BEDOL width
+latent_dim,48,validation-selected
+site_emb_dim,8,validation-selected
+dropout,0.11731530334443374,validation-selected
+learning_rate,0.0007805065557387398,validation-selected
+weight_decay,0.00003585216816340529,validation-selected
+teacher_forcing_start,0.670244553854209,training schedule only
+teacher_forcing_zero_fraction,0.5973738802854409,fraction of training schedule
+kl_weight,0.0000625644792681947,variational regularization
+prior_sigma,0.5,latent prior standard deviation
+huber_delta,0.1,loss component
+w_huber,0.2,loss weight
+w_ramp,0.04,loss weight
+w_energy,0.015,loss weight
+w_nll,0.08,loss weight
+paper_epochs,120,maximum epochs
+paper_patience,15,early-stopping patience
+paper_seeds,"11;29;47",final ensemble seeds
+bootstrap_block_origins,28,primary block length
+bootstrap_reps,5000,paper statistical run
