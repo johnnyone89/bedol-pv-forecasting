@@ -1,0 +1,23 @@
+column,role,used_by_core_notebook,notes
+interval_start_kst,timestamp,yes,Forecast chronology
+site_id,site identifier,yes,Shared model site index
+solar_power_filled,target,yes,Filled hourly PV target in kW
+target_imputed,target provenance,audit,1 indicates model-imputed target
+recommended_for_training_filled,quality/training flag,audit,Recommended training mask for filled target
+recommended_for_evaluation,quality/evaluation flag,audit,Recommended primary evaluation mask
+quality_flag,quality annotation,audit,Human-readable data-quality status
+temp_mean,historical weather,yes,Standardized using training period only
+temp_min,historical weather,yes,Standardized using training period only
+temp_max,historical weather,yes,Standardized using training period only
+precip,historical weather,yes,Standardized using training period only
+vapor_pressure,historical weather,yes,Standardized using training period only
+dew_point,historical weather,yes,Standardized using training period only
+sunshine_duration,historical weather,yes,Standardized using training period only
+solar_radiation,historical weather,yes,Standardized using training period only
+cloud_cover,historical weather,yes,Standardized using training period only
+ground_temp,historical weather,yes,Standardized using training period only
+air_temp,historical weather,yes,Standardized using training period only
+wind_speed,historical weather,yes,Standardized using training period only
+air_pressure,historical weather,yes,Standardized using training period only
+relative_humidity,historical weather,yes,Standardized using training period only
+hour/day-of-year/day-of-week,derived calendar,yes,Deterministic future-known calendar encoding created by notebook
