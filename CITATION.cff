@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use the released BEDOL data or code, please cite this repository; cite the associated paper when its final publication record is available."
+type: software
+title: "BEDOL PV Forecasting: Reproducibility Resources for Bounded Energy Dynamics with Observation-Conditioned Latents"
+authors:
+  - family-names: Moon
+    given-names: Jihoon
+  - family-names: Rho
+    given-names: Seungmin
+url: "https://github.com/johnnyone89/bedol-pv-forecasting"
