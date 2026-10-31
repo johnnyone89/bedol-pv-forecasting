@@ -1,10 +1,16 @@
 # BEDOL PV Forecasting
 
-Reproducibility resources for **BEDOL (Bayesian Energy-Dynamics Operator Learning)**, a shared selective state-space framework for 24-step-ahead multi-site photovoltaic power forecasting.
+Reproducibility resources for **BEDOL (bounded energy dynamics with observation-conditioned latents)**, a shared selective state-space framework for 24-step-ahead multisite photovoltaic (PV) power forecasting.
+
+## Methodological scope
+
+BEDOL learns an input-dependent **shared selective-state transition** from historical observations across six South Korean PV sites. **Site identity is introduced downstream of the shared temporal encoder**, rather than conditioning the shared transition itself. A recurrent decoder produces a 24-step forecast. The stochastic variational latent layer is used for **uncertainty representation**; the ablation evidence does not establish an improvement in point accuracy from this layer.
+
+The state update has a bounded invariant domain by construction. A separate analysis provides **sufficient conditions** for local contraction and perturbation control; it does **not** certify global contractivity of the fitted network. BEDOL is a finite-dimensional discrete state-transition model, **not a neural operator in the function-space sense**, and is not presented as a Mamba implementation. Claims of cross-site sharing concern the **six observed sites**, not zero-shot transfer to unseen sites.
 
 ## Reproducibility philosophy
 
-This repository is intentionally organized so that a reader can re-run the method from the released six-site CSV files. It does **not** publish every fitted prediction, checkpoint, bootstrap draw, or intermediate paper artifact. Instead, it provides the data specification, frozen chronological split, validation-selected configuration, compact reference metrics, and a sequence of purpose-specific notebooks.
+This repository supports re-execution of the **released BEDOL core workflow** using six public site CSV files. It does **not** contain every fitted prediction, checkpoint, bootstrap draw, full common-protocol baseline implementation, or complete MCS/SPA analysis underlying the paper. Instead, it provides the data specification, fixed chronological split, validation-selected configuration, compact paper-reference metrics, and purpose-specific notebooks for BEDOL training, evaluation, selected ablations, grouped XAI, and uncertainty diagnostics.
 
 Exact floating-point values can vary slightly across GPU models, CUDA/cuDNN versions, and PyTorch releases. The goal is faithful re-execution of the protocol and recovery of the same qualitative findings, not bit-for-bit equality.
 
@@ -20,7 +26,8 @@ Exact floating-point values can vary slightly across GPU models, CUDA/cuDNN vers
 │   ├── experiment_config.csv
 │   └── site_manifest.csv
 ├── data/
-│   └── README.md
+│   ├── README.md
+│   └── 01_..._FILLED.csv through 06_..._FILLED.csv
 ├── notebooks/
 │   ├── 00_data_audit_and_split.ipynb
 │   ├── 01_train_bedol_core.ipynb
@@ -33,9 +40,9 @@ Exact floating-point values can vary slightly across GPU models, CUDA/cuDNN vers
     └── bedol_repro.py
 ```
 
-## English-only data filenames
+## Released six-site data files
 
-Rename the six released CSV files exactly as follows and place them in `data/`:
+The following six CSV files are **already included** in `data/`. Keep these filenames unchanged when running the notebooks:
 
 - `01_Busan_New_Port_FILLED.csv`
 - `02_Busan_Water_Treatment_FILLED.csv`
@@ -61,7 +68,7 @@ Retrains only the mechanism variants needed to test the main architectural claim
 ### 04 — XAI and uncertainty
 Uses the freshly trained BEDOL checkpoint(s) for grouped blocked-permutation model-reliance analysis and Monte Carlo latent sampling for interval diagnostics. It does not use cached XAI or uncertainty results.
 
-## Main frozen protocol
+## Validation-locked protocol
 
 - Historical lookback: **168 h**
 - Forecast horizon: **24 h**
@@ -90,4 +97,10 @@ Run the notebooks in numerical order. Start with `FAST` mode in Notebook 01 to v
 
 ## Citation
 
-Please cite the BEDOL paper once the final bibliographic record is available. This section will be updated after publication.
+For use of this repository's data and code, cite this repository using the **Cite this repository** option (generated from `CITATION.cff`). The associated manuscript is *BEDOL: Bounded Energy Dynamics with Observation-Conditioned Latents for 24-Step-Ahead Multisite Solar Power Forecasting* (Jihoon Moon and Seungmin Rho); its journal citation and DOI should be added only after publication.
+
+Repository: https://github.com/johnnyone89/bedol-pv-forecasting
+
+## Licensing and reuse
+
+No software or dataset license is currently declared in this repository. Public availability should not be interpreted as permission for unrestricted reuse or redistribution. Verify the rights to the six source datasets before adding a license.
