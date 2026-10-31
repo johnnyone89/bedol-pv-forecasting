@@ -1,6 +1,6 @@
 # Data folder
 
-Place the six released site files in this directory using the following English-only filenames:
+The following six released site CSV files are already present in this directory. Preserve these filenames for the reproduction workflow:
 
 1. `01_Busan_New_Port_FILLED.csv`
 2. `02_Busan_Water_Treatment_FILLED.csv`
@@ -19,4 +19,4 @@ The notebooks validate these filenames against `configs/site_manifest.csv`.
 - Recommended primary evaluation mask: `recommended_for_evaluation=1`
 - Data-quality annotation: `quality_flag`
 
-The public reproduction workflow regenerates predictions and summary results from the released data. It does not require cached paper predictions or precomputed bootstrap draws.
+The public reproduction workflow regenerates BEDOL-core predictions and selected summary analyses from the released data. It does not require cached paper predictions or precomputed bootstrap draws. The repository does not reproduce every baseline model or all paper-level inferential procedures. Reported test metrics use directly observed, evaluation-eligible targets; filled targets may be used only where permitted for training.
